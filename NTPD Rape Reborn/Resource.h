@@ -14,6 +14,7 @@
 #define IDI_NTPDRAPEREBORN		107
 #define IDI_SMALL				108
 #define IDC_NTPDRAPEREBORN		109
+#define DisableButton           110
 #define IDC_MYICON				2
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1

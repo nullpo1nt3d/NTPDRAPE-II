@@ -43,10 +43,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "NTPD Rape Reborn"
 FONT 14, "Impact"
 BEGIN
-    LTEXT "NTPD RAPE REBORN", -1, 33, 12, 68, 11, SS_NOPREFIX
-    DEFPUSHBUTTON "Begin", BeginEndButton, 46, 24, 39, 11, WS_GROUP
-    //LTEXT "Instances ran so far:", -1, 2, 41, 75, 11, SS_NOPREFIX
-    //LTEXT "", Instances, 76, 41, 52, 11, SS_NOPREFIX | SS_EDITCONTROL
+    AUTOCHECKBOX     "", DisableButton, 96, 24, 11, 11
+    LTEXT            "NTPD RAPE REBORN", -1, 33, 12, 68, 11, SS_NOPREFIX
+    DEFPUSHBUTTON    "Begin", BeginEndButton, 46, 24, 39, 11, WS_GROUP
+    //LTEXT            "Instances ran so far:", -1, 2, 41, 75, 11, SS_NOPREFIX
+    //LTEXT            "", Instances, 76, 41, 52, 11, SS_NOPREFIX | SS_EDITCONTROL
 END
 
 /////////////////////////////////////////////////////////////////////////////
