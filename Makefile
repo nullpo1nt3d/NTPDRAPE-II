@@ -25,6 +25,7 @@ BINDIR = bin
 OBJDIR = obj
 
 OBJS = $(OBJDIR)/$(PROGRAM_NAME).res \
+	   $(OBJDIR)/utils.o \
        $(OBJDIR)/main.o
 
 all: $(BINDIR)/$(PROGRAM_NAME).exe
