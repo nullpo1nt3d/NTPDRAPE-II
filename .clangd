@@ -1,0 +1,9 @@
+CompileFlags:
+    Add: [
+            -D_X86_, # Target arch (x86 for compatibility)
+            -D_DEBUG, # debug code is eval'd
+            -DUNICODE, -D_UNICODE, # using unicode
+            -D_CRT_SECURE_NO_DEPRECATE, # no deprecated stdio function warnings
+            -xc++, # treat every file as cpp
+            -Wall # every warning is shown
+         ]

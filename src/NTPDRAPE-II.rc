@@ -1,0 +1,16 @@
+#include "Resource.h"
+#include <windows.h>
+
+NtpdRapeII_Icon       ICON         "res/NTPDRAPE-II.ico"
+
+Main_Dlg DIALOGEX 55, 0, 131, 53
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NTPD Rape Reborn"
+FONT 14, "Impact"
+BEGIN
+    AUTOCHECKBOX     "", DisableBtn_CheckBox, 96, 24, 11, 11
+    LTEXT            "NTPD RAPE REBORN", IDC_STATIC, 33, 12, 68, 11, SS_NOPREFIX
+    DEFPUSHBUTTON    "Begin", BeginEnd_Button, 46, 24, 39, 11, WS_GROUP
+    LTEXT            "Instances ran so far:", IDC_STATIC, 2, 41, 75, 11, SS_NOPREFIX
+    LTEXT            "", InstancesCount, 76, 41, 52, 11, SS_NOPREFIX | SS_EDITCONTROL
+END
