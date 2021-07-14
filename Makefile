@@ -10,7 +10,7 @@ CXXFLAGS = -nologo -m32 -std:c++17 -D_CRT_SECURE_NO_DEPRECATE -O1 -D UNICODE -D 
 LDFLAGS = -nologo -manifest:EMBED comctl32.lib shell32.lib user32.lib winmm.lib
 
 ifeq ($(MODE), debug)
-CXXFLAGS = -nologo -m32 -D_CRT_SECURE_NO_DEPRECATE -D UNICODE -D _DEBUG -EHsc -TP -Zi -MTd -Gz
+CXXFLAGS = -nologo -m32 -std:c++17 -D_CRT_SECURE_NO_DEPRECATE -D UNICODE -D _DEBUG -EHsc -TP -Zi -MTd -Gz
 LDFLAGS = -nologo -manifest:EMBED -DEBUG:FULL comctl32.lib shell32.lib user32.lib winmm.lib
 endif
 
