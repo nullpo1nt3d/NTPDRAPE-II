@@ -1,10 +1,9 @@
 /* main.cpp - contains the entry point for NTPDRAPE-II */
 
+#include "common.hpp"
 #include "Resource.h"
 #include <process.h>
 #include <shlobj.h>
-#include <vector>
-#include <windows.h>
 #include <windowsx.h>
 #include <winternl.h>
 
@@ -14,12 +13,14 @@ std::vector<HANDLE> InvokeNtpdThreadHandles;
 
 UINT StaticControlIDs[] = {
 	BeginEnd_Button,
-	DisableBtn_CheckBox
+	DisableBtn_CheckBox,
+	ThreadsToRun_EditBox
 };
 
 wchar_t* StaticControlTooltips[] = {
 	L"Start Notepad Rape",
-	L"Disable start button once pressed (point of no return)"
+	L"Disable start button once pressed (point of no return)",
+	L"Amount of Notepad invoking threads to run"
 };
 
 //------------------------------------------------ Definitions
@@ -66,6 +67,62 @@ void CreateControlTooltips(HWND OwnerWnd)
 	}
 }
 
+void BeginEndNtpdRape(HWND ownerWnd)
+{
+	static bool isNtpdRapeRunning = false;
+	UINT threadsToRun;
+	
+	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox))
+		EnableWindow(GetDlgItem(ownerWnd, BeginEnd_Button), 0);
+
+	EnableWindow(GetDlgItem(ownerWnd, ThreadsToRun_EditBox), isNtpdRapeRunning ? true : false);
+
+	if (!isNtpdRapeRunning)
+	{
+		static bool isMidiExtracted = false;
+		static wchar_t extractPath[MAX_PATH];
+
+		// Extract midi if it isn't already extracted
+		if (!isMidiExtracted)
+		{
+			SHGetSpecialFolderPath(ownerWnd, extractPath, CSIDL_COMMON_APPDATA, false);
+			wcscat(extractPath, L"\\Mid0.mid");
+
+			if (Utils::Resource::ExtractFromResource(extractPath, MAKEINTRESOURCE(ResourceMidi_File)))
+				isMidiExtracted = true;
+		}
+
+		// For some reason, this process takes a while to complete
+		// and stalls program operation for ~ 2 seconds.
+		if (isMidiExtracted)
+			Utils::MIDI::PlayMIDIFromPath(ownerWnd, extractPath);
+
+#ifndef _DEBUG
+		// Create the notepad invoking threads
+		for (int threadsRunning = 0; threadsRunning <= threadsToRun; threadsRunning++)
+			InvokeNtpdThreadHandles.push_back(CreateThread(nullptr, 0, InvokeNotepad, nullptr, 0, nullptr));
+#endif // _DEBUG
+
+		isNtpdRapeRunning = true;
+		SetDlgItemText(ownerWnd, BeginEnd_Button, L"End");
+	}
+			
+	else
+	{
+		
+#ifndef _DEBUG
+		// Scroll through the thread handles and terminate them
+		for (int threads = threadsToRun; threads >= 0; threads--)
+			TerminateThread(InvokeNtpdThreadHandles.at(threads), 0);
+#endif
+
+		// Stop the midi
+		mciSendCommand(Utils::MIDI::midiDeviceId, MCI_CLOSE, 0, 0);
+
+		isNtpdRapeRunning = false;
+		SetDlgItemText(ownerWnd, BeginEnd_Button, L"Begin");
+	}
+}
 
 INT_PTR CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -89,6 +146,12 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	
 			return true;
 	
+		case MM_MCINOTIFY:
+		{
+			mciSendCommand(Utils::MIDI::midiDeviceId, MCI_CLOSE, 0, 0);
+			break;
+		}
+
 		case WM_COMMAND:
 	
 			switch(LOWORD(wParam))
@@ -103,32 +166,8 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				case BeginEnd_Button:
 				{
-					static bool InvokeNtpdRunning = false;
-					UINT threadsToRun = 5; // temporary default
-	
-					if (IsDlgButtonChecked(hwnd, DisableBtn_CheckBox))
-						EnableWindow(GetDlgItem(hwnd, BeginEnd_Button), 0);
-			
-					if (!InvokeNtpdRunning)
-					{
-						InvokeNtpdRunning = true;
-						SetDlgItemText(hwnd, BeginEnd_Button, L"End");
-	
-						// Create the notepad invoking threads
-						for (int threadsRunning = 0; threadsRunning <= threadsToRun; threadsRunning++)
-							InvokeNtpdThreadHandles.push_back(CreateThread(nullptr, 0, InvokeNotepad, nullptr, 0, nullptr));
-					}
-			
-					else
-					{
-						InvokeNtpdRunning = false;
-			
-						// Scroll through the thread handles and terminate them
-						for (int threads = threadsToRun; threads >= 0; threads--)
-							TerminateThread(InvokeNtpdThreadHandles.at(threads), 0);
-			
-						SetDlgItemText(hwnd, BeginEnd_Button, L"Begin");
-					}
+					BeginEndNtpdRape(hwnd);
+					break;
 				}
 				break;
 			}
