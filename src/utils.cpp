@@ -50,20 +50,30 @@ namespace Utils {
 			// Don't waste time if we already extracted
 			if (std::filesystem::exists(dest))
 				return true;
+            
+			bool extract_ok = false;
+            DWORD resSize = 0;
+            HGLOBAL hglobal = nullptr;
+            HRSRC rsrc = nullptr;
+            LPVOID rsrcData = nullptr;
 
-		    HRSRC rsrc = FindResource(nullptr, resName, RT_RCDATA);
-		    if (!rsrc)
-		        return false;
-		        
-		    DWORD resSize = SizeofResource(nullptr, rsrc);
-		    if (!resSize)
-		        return false;
-		    
-		    LPVOID rsrcData = LockResource(LoadResource(nullptr, rsrc));
-		    if (!rsrcData)
-		        return false;
+            // Find the resource
+            rsrc = FindResource(nullptr, resName, RT_RCDATA);
+            if (!rsrc)
+                goto exit;
+            
+            // Get the size
+            resSize = SizeofResource(nullptr, rsrc);
+            if (!resSize)
+                goto exit;
+
+            // Lock the resource (get a pointer to the resource)
+            rsrcData = LockResource(LoadResource(nullptr, rsrc));
+            if (!rsrcData)
+                goto exit;
 	
-		    HGLOBAL hglobal = GlobalAlloc(GMEM_MOVEABLE, resSize);
+			// Allocate memory for the resource
+		    hglobal = GlobalAlloc(GMEM_MOVEABLE, resSize);
 		    if (hglobal)
 		    {
 		        LPVOID extractBuffer = GlobalLock(hglobal);
@@ -78,13 +88,15 @@ namespace Utils {
 		                if(WriteFile(file, extractBuffer, resSize, &bytesWritten, nullptr)
 		                   &&
 		                   CloseHandle(file))
-		                   return true; // Would this memleak???
+		                   extract_ok = true;
 		            }
 		            GlobalUnlock(hglobal);
 		        }
 		        GlobalFree(hglobal);
 		    }
-		  	return false;
+
+		    exit:
+		  	return extract_ok;
 		}
 	
 		bool ExtractFromResource(const wchar_t* dest, LPCWSTR resName)
