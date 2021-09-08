@@ -2,16 +2,16 @@
 # so that it does what I need.
 
 MODE = release
-CXX = clang-cl
+CXX = clang++
 LD = lld-link
 RCTOOL = rc
 
-CXXFLAGS = -nologo -m32 -std:c++17 -D_CRT_SECURE_NO_DEPRECATE -O1 -D UNICODE -D NDEBUG -EHsc -TP -MT -Gz
-LDFLAGS = -nologo -manifest:EMBED comctl32.lib shell32.lib user32.lib winmm.lib
+CXXFLAGS = -m32 -std=c++17 -Wall -D_X86_ -D_CRT_SECURE_NO_DEPRECATE -O1 -D UNICODE -D NDEBUG
+LDFLAGS = -manifest:EMBED comctl32.lib shell32.lib user32.lib winmm.lib libcmt.lib # vcruntime.lib
 
 ifeq ($(MODE), debug)
-CXXFLAGS = -nologo -m32 -std:c++17 -D_CRT_SECURE_NO_DEPRECATE -D UNICODE -D _DEBUG -EHsc -TP -Zi -MTd -Gz
-LDFLAGS = -nologo -manifest:EMBED -DEBUG:FULL comctl32.lib shell32.lib user32.lib winmm.lib
+CXXFLAGS = -m32 -std=c++17 -Wall -D_X86_ -D_CRT_SECURE_NO_DEPRECATE -D UNICODE -D _DEBUG
+LDFLAGS = -manifest:EMBED comctl32.lib libcmtd.lib shell32.lib user32.lib winmm.lib
 endif
 
 RCFLAGS = -nologo
@@ -57,7 +57,7 @@ endif
 # Compilation phase
 $(OBJDIR)/%.o: src/%.cpp
 	@echo "[>] CXX $<"
-	@$(CXX) -c $(CXXFLAGS) $< -Fo$@
+	@$(CXX) -c $(CXXFLAGS) $< -o$@
 
 # Resource compilation
 $(OBJDIR)/%.res: src/%.rc
