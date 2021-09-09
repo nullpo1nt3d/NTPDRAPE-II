@@ -17,7 +17,7 @@ UINT StaticControlIDs[] = {
 	ThreadsToRun_EditBox
 };
 
-wchar_t* StaticControlTooltips[] = {
+const wchar_t* StaticControlTooltips[] = {
 	L"Start Notepad Rape",
 	L"Disable start button once pressed (point of no return)",
 	L"Amount of Notepad invoking threads to run"
@@ -62,7 +62,7 @@ void CreateControlTooltips(HWND OwnerWnd)
 	for (int i = 0; i < ARRAYSIZE(StaticControlIDs); i++)
 	{
 		ti.uId = (UINT_PTR)GetDlgItem(OwnerWnd, StaticControlIDs[i]);
-		ti.lpszText = StaticControlTooltips[i];
+		ti.lpszText = const_cast<wchar_t*>(StaticControlTooltips[i]);
 		SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)&ti);
 	}
 }
