@@ -61,7 +61,7 @@ void CreateControlTooltips(HWND OwnerWnd)
 	// to that of the control's tooltip text array.
 	for (int i = 0; i < ARRAYSIZE(StaticControlIDs); i++)
 	{
-		ti.uId = (UINT_PTR)GetDlgItem(OwnerWnd, StaticControlIDs[i]);
+		ti.uId = reinterpret_cast<UINT_PTR>(GetDlgItem(OwnerWnd, StaticControlIDs[i]));
 		ti.lpszText = const_cast<wchar_t*>(StaticControlTooltips[i]);
 		SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)&ti);
 	}
