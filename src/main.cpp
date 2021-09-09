@@ -70,12 +70,14 @@ void CreateControlTooltips(HWND OwnerWnd)
 void BeginEndNtpdRape(HWND ownerWnd)
 {
 	static bool isNtpdRapeRunning = false;
-	UINT threadsToRun;
-	
-	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox))
-		EnableWindow(GetDlgItem(ownerWnd, BeginEnd_Button), 0);
+	UINT threadsToRun = GetDlgItemInt(ownerWnd, ThreadsToRun_EditBox, nullptr, false);
+	if (threadsToRun == 0)
+		return;
 
-	EnableWindow(GetDlgItem(ownerWnd, ThreadsToRun_EditBox), isNtpdRapeRunning ? true : false);
+	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox))
+		EnableWindow(GetDlgItem(ownerWnd, BeginEnd_Button), false);
+
+	EnableWindow(GetDlgItem(ownerWnd, ThreadsToRun_EditBox), isNtpdRapeRunning);
 
 	if (!isNtpdRapeRunning)
 	{
