@@ -37,11 +37,13 @@ endif
 # Rules for output directories
 $(BINDIR)/:
 	@echo "[>] Creating $@ directory"
-	@mkdir $(BINDIR)
+	@if exist "$@" echo "[>] $@ directory already exists"
+	@if not exist "$@" mkdir $(BINDIR)
 
 $(OBJDIR)/:
 	@echo "[>] Creating $@ directory"
-	@mkdir $(OBJDIR)
+	@if exist "$@" echo "[>] $@ directory already exists"
+	@if not exist "$@" mkdir $(OBJDIR)
 
 # Linking and manifesting phase
 ifeq ($(MODE), debug)
