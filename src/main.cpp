@@ -74,8 +74,11 @@ void BeginEndNtpdRape(HWND ownerWnd)
 	if (threadsToRun == 0)
 		return;
 
-	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox))
+	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox) && isNtpdRapeRunning == false)
+	{
 		EnableWindow(GetDlgItem(ownerWnd, BeginEnd_Button), false);
+		EnableWindow(GetDlgItem(ownerWnd, DisableBtn_CheckBox), false);
+	}
 
 	EnableWindow(GetDlgItem(ownerWnd, ThreadsToRun_EditBox), isNtpdRapeRunning);
 
