@@ -14,29 +14,31 @@ namespace Utils {
 			mciOpenParms.lpstrDeviceType = L"sequencer";
 			mciOpenParms.lpstrElementName = path;
 
+			// Open the midi device
 			DWORD dwReturn;
-			if ((dwReturn = mciSendCommand(0, MCI_OPEN, 
-										 MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPMCI_OPEN_PARMS)&mciOpenParms)))
-				return (dwReturn);
+			if ((dwReturn = mciSendCommand(0, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, reinterpret_cast<DWORD_PTR>(&mciOpenParms))))
+				return LOWORD(dwReturn);
 
 			midiDeviceId = mciOpenParms.wDeviceID;
 
 			MCI_STATUS_PARMS mciStatusParms;
 			mciStatusParms.dwItem = MCI_SEQ_STATUS_PORT;
 
-			if ((dwReturn = mciSendCommand(midiDeviceId, MCI_STATUS, MCI_STATUS_ITEM, (DWORD)(LPMCI_STATUS_PARMS)&mciStatusParms)))
+			// Set the sequencer status
+			if ((dwReturn = mciSendCommand(midiDeviceId, MCI_STATUS, MCI_STATUS_ITEM, reinterpret_cast<DWORD_PTR>(&mciStatusParms))))
 			{
 				mciSendCommand(midiDeviceId, MCI_CLOSE, 0, 0);
-				return (dwReturn);
+				return LOWORD(dwReturn);
 			}
 
 			MCI_PLAY_PARMS mciPlayParms;
-			mciPlayParms.dwCallback = (DWORD)hwnd;
+			mciPlayParms.dwCallback = reinterpret_cast<DWORD_PTR>(hwnd);
 
-			if ((dwReturn = mciSendCommand(midiDeviceId, MCI_PLAY, MCI_NOTIFY, (DWORD)(MCI_PLAY_PARMS*)&mciPlayParms)))
+			// Play the midi
+			if ((dwReturn = mciSendCommand(midiDeviceId, MCI_PLAY, MCI_NOTIFY, reinterpret_cast<DWORD_PTR>(&mciPlayParms))))
 			{
 				mciSendCommand(midiDeviceId, MCI_CLOSE, 0, 0);
-				return (dwReturn);
+				return LOWORD(dwReturn);
 			}
 
 			return S_OK;
