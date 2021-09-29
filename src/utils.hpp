@@ -1,7 +1,7 @@
 /* utils.hpp - contains declarations for the utilities to be used by NTPDRAPE-II */
 
 #pragma once
-#include "common.hpp"
+#include <windef.h>
 
 namespace Utils {
 
