@@ -1,7 +1,13 @@
 /* utils.cpp - contains the utilities to be used by NTPDRAPE-II */
 
-#include "common.hpp"
+#include "utils.hpp"
+#include <basetsd.h>
+#include <fileapi.h>
 #include <filesystem>
+#include <libloaderapi.h>
+#include <mciapi.h>
+#include <winbase.h>
+#include <winuser.h>
 
 
 namespace Utils {
