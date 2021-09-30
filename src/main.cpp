@@ -72,7 +72,10 @@ void BeginEndNtpdRape(HWND ownerWnd)
 	static bool isNtpdRapeRunning = false;
 	UINT threadsToRun = GetDlgItemInt(ownerWnd, ThreadsToRun_EditBox, nullptr, false);
 	if (threadsToRun == 0)
+	{
+		MessageBoxA(ownerWnd, "No thread amount was provided!", "", MB_ICONERROR);
 		return;
+	}
 
 	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox) && isNtpdRapeRunning == false)
 	{
