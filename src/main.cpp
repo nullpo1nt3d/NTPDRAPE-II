@@ -7,9 +7,9 @@
 #include <windowsx.h>
 #include <winternl.h>
 
+bool g_bIsNtpdRapeRunning;
 HINSTANCE hInst;
 HWND main_dlg_window;
-std::vector<HANDLE> InvokeNtpdThreadHandles;
 
 UINT StaticControlIDs[] = {
 	BeginEnd_Button,
@@ -28,7 +28,7 @@ const wchar_t* StaticControlTooltips[] = {
 DWORD WINAPI InvokeNotepad(LPVOID)
 {
 	static int TotalInstances = 0;
-	while (true)
+	while (g_bIsNtpdRapeRunning)
 	{
 		// // Sanity Check
 		// if (GetKeyState(VK_CONTROL) < 0)
@@ -69,7 +69,6 @@ void CreateControlTooltips(HWND OwnerWnd)
 
 void BeginEndNtpdRape(HWND ownerWnd)
 {
-	static bool isNtpdRapeRunning = false;
 	UINT threadsToRun = GetDlgItemInt(ownerWnd, ThreadsToRun_EditBox, nullptr, false);
 	if (threadsToRun == 0)
 	{
@@ -77,15 +76,15 @@ void BeginEndNtpdRape(HWND ownerWnd)
 		return;
 	}
 
-	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox) && isNtpdRapeRunning == false)
+	if (IsDlgButtonChecked(ownerWnd, DisableBtn_CheckBox) && g_bIsNtpdRapeRunning == false)
 	{
 		EnableWindow(GetDlgItem(ownerWnd, BeginEnd_Button), false);
 		EnableWindow(GetDlgItem(ownerWnd, DisableBtn_CheckBox), false);
 	}
 
-	EnableWindow(GetDlgItem(ownerWnd, ThreadsToRun_EditBox), isNtpdRapeRunning);
+	EnableWindow(GetDlgItem(ownerWnd, ThreadsToRun_EditBox), g_bIsNtpdRapeRunning);
 
-	if (!isNtpdRapeRunning)
+	if (!g_bIsNtpdRapeRunning)
 	{
 		static bool isMidiExtracted = false;
 		static wchar_t extractPath[MAX_PATH];
@@ -107,27 +106,21 @@ void BeginEndNtpdRape(HWND ownerWnd)
 
 #ifndef _DEBUG
 		// Create the notepad invoking threads
+		g_bIsNtpdRapeRunning = true;
 		for (int threadsRunning = 0; threadsRunning <= threadsToRun; threadsRunning++)
-			InvokeNtpdThreadHandles.push_back(CreateThread(nullptr, 0, InvokeNotepad, nullptr, 0, nullptr));
+			CreateThread(nullptr, 0, InvokeNotepad, nullptr, 0, nullptr);
 #endif // _DEBUG
 
-		isNtpdRapeRunning = true;
 		SetDlgItemText(ownerWnd, BeginEnd_Button, L"End");
 	}
 			
 	else
 	{
-		
-#ifndef _DEBUG
-		// Scroll through the thread handles and terminate them
-		for (int threads = threadsToRun; threads >= 0; threads--)
-			TerminateThread(InvokeNtpdThreadHandles.at(threads), 0);
-#endif
+		g_bIsNtpdRapeRunning = false;
 
 		// Stop the midi
 		mciSendCommand(Utils::MIDI::midiDeviceId, MCI_CLOSE, 0, 0);
-
-		isNtpdRapeRunning = false;
+		
 		SetDlgItemText(ownerWnd, BeginEnd_Button, L"Begin");
 	}
 }
