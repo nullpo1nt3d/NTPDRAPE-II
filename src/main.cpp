@@ -160,7 +160,8 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case IDOK:
 				case IDCANCEL:
 				{
-					PostQuitMessage(0);
+					if (!IsDlgButtonChecked(hwnd, DisableBtn_CheckBox))
+						PostQuitMessage(0);
 					return true;
 				}
 				break;
